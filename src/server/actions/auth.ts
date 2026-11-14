@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { createSession, destroySession } from "@/lib/session";
 import { DEMO_LOGINS, DEMO_MODE } from "@/lib/config";
 import { ROLE_HOME, type Role } from "@/lib/constants";
+import { findEdFarmRecord } from "@/lib/edfarm-records";
 
 export type FormState = { ok: boolean; error?: string } | null;
 
@@ -106,7 +107,43 @@ const studentSchema = z.object({
   bio: z.string().trim().max(600).default(""),
 });
 
-/** Creates User STUDENT + Student, logs in, goes to /student/profile. */
+/**
+ * A2: copy completed Ed Farm courses from the (mock) learner records into verified achievements.
+ * Best effort only: no match, a missing admin, or any error leaves signup untouched.
+ */
+async function syncEdFarmRecord(studentId: string, email: string, formCohort: string) {
+  try {
+    const record = findEdFarmRecord(email);
+    if (!record) return;
+
+    if (!formCohort && record.cohort) {
+      await prisma.student.update({ where: { id: studentId }, data: { cohort: record.cohort } });
+    }
+
+    const admin = await prisma.user.findFirst({
+      where: { email: "coach@edfarm.demo", role: "ADMIN" },
+      select: { id: true },
+    });
+    if (!admin || record.completed.length === 0) return;
+
+    await prisma.achievement.createMany({
+      data: record.completed.map((c) => {
+        const on = new Date(c.completedOn);
+        return {
+          studentId,
+          title: c.title,
+          detail: `${c.detail} (synced from Ed Farm records)`,
+          addedById: admin.id,
+          ...(Number.isNaN(on.getTime()) ? {} : { awardedAt: on }),
+        };
+      }),
+    });
+  } catch (err) {
+    console.error("Ed Farm records sync skipped:", err);
+  }
+}
+
+/** Creates User STUDENT + Student, syncs Ed Farm records if the email matches, logs in, goes to /student/profile. */
 export async function registerStudent(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = studentSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check your details." };
@@ -129,7 +166,10 @@ export async function registerStudent(_prev: FormState, formData: FormData): Pro
         },
       },
     },
+    select: { id: true, student: { select: { id: true } } },
   });
+
+  if (user.student) await syncEdFarmRecord(user.student.id, d.email, d.cohort);
 
   await createSession({ userId: user.id, role: "STUDENT" });
   redirect("/student/profile");

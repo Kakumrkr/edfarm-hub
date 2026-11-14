@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { ExternalLink, FileText } from "lucide-react";
+import { ExternalLink, FileText, ShieldCheck } from "lucide-react";
 import { requireUser } from "@/lib/auth";
+import { findEdFarmRecord } from "@/lib/edfarm-records";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 import { PageHeader } from "@/components/ui/page-header";
@@ -36,6 +37,7 @@ export default async function StudentProfilePage({ searchParams }: PageProps<"/s
     },
   });
   if (!student) notFound();
+  const edfarm = findEdFarmRecord(user.email);
 
   return (
     <>
@@ -55,6 +57,24 @@ export default async function StudentProfilePage({ searchParams }: PageProps<"/s
         </Card>
 
         <div className="space-y-6">
+          {edfarm && (
+            <Card className="border-emerald-200 bg-emerald-50/40">
+              <p className="flex items-center gap-2 text-sm font-medium text-emerald-900">
+                <ShieldCheck className="size-4 shrink-0 text-emerald-700" aria-hidden />
+                Linked to your Ed Farm learner record
+              </p>
+              {edfarm.current && (
+                <div className="mt-3 border-t border-emerald-200 pt-3">
+                  <p className="text-sm text-stone-700">
+                    Currently at Ed Farm:{" "}
+                    <span className="font-medium text-stone-900">{edfarm.current.program}</span> ({edfarm.current.status})
+                  </p>
+                  <VerifiedBadge className="mt-2" />
+                </div>
+              )}
+            </Card>
+          )}
+
           <Card id="resume">
             <CardTitle className="mb-1">Resume</CardTitle>
             <p className="mb-4 text-sm text-stone-500">PDF only, up to 2 MB. Required to apply.</p>

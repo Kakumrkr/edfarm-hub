@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Briefcase, ShieldCheck, Sprout, Users } from "lucide-react";
 import { CATEGORIES, ORG_TYPES, type Category, type OrgType } from "@/lib/constants";
 import { csvToList, formatDate } from "@/lib/format";
+import { prisma } from "@/lib/db";
+import { findEdFarmRecord } from "@/lib/edfarm-records";
 import { getPublicProfile } from "@/server/queries";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +26,9 @@ export default async function PublicProfilePage({ params }: PageProps<"/s/[id]">
   const profile = await getPublicProfile(id);
   if (!profile) notFound();
   const { student, current, completed, stats } = profile;
+  // A2: read the current Ed Farm program live. Only program + status are rendered, never the email (R16).
+  const owner = await prisma.student.findUnique({ where: { id: student.id }, select: { user: { select: { email: true } } } });
+  const edfarmNow = findEdFarmRecord(owner?.user.email)?.current ?? null;
   const skills = csvToList(student.skills);
   const name = student.user.name;
 
@@ -143,6 +148,16 @@ export default async function PublicProfilePage({ params }: PageProps<"/s/[id]">
         </section>
 
         <aside className="order-1 space-y-8 lg:order-2">
+          {edfarmNow && (
+            <section className="rounded-2xl border border-emerald-200 bg-white px-4 py-4 shadow-sm">
+              <p className="text-sm text-stone-700">
+                Currently at Ed Farm: <span className="font-medium text-stone-900">{edfarmNow.program}</span>
+                {` (${edfarmNow.status})`}
+              </p>
+              <VerifiedBadge className="mt-2" />
+            </section>
+          )}
+
           <section>
             <CardTitle className="mb-3">Ed Farm achievements</CardTitle>
             {student.achievements.length === 0 ? (
