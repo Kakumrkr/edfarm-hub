@@ -55,3 +55,88 @@ export const memberSelect = {
   user: { select: { name: true, email: true } },
   achievements: { select: { id: true, title: true }, orderBy: { awardedAt: "desc" as const } },
 } as const;
+
+/**
+ * Public trust profile (R16): no email, no resume, no DECLINED/WITHDRAWN/CANCELLED.
+ * Merges applications where the student is lead or teammate. Hidden reviews are stripped (R13).
+ */
+export async function getPublicProfile(studentId: string) {
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    select: {
+      id: true,
+      bio: true,
+      skills: true,
+      cohort: true,
+      user: { select: { name: true } },
+      achievements: {
+        orderBy: { awardedAt: "desc" },
+        select: { id: true, title: true, detail: true, awardedAt: true },
+      },
+    },
+  });
+  if (!student) return null;
+
+  const person = { select: { id: true, user: { select: { name: true } } } };
+  const apps = await prisma.application.findMany({
+    where: {
+      status: { in: ["IN_PROGRESS", "COMPLETED"] },
+      OR: [{ studentId }, { teammateId: studentId }],
+    },
+    orderBy: [{ completedAt: "desc" }, { acceptedAt: "desc" }],
+    select: {
+      id: true,
+      status: true,
+      acceptedAt: true,
+      completedAt: true,
+      completedBy: true,
+      rating: true,
+      review: true,
+      reviewHidden: true,
+      studentSummary: true,
+      studentId: true,
+      student: person,
+      teammate: person,
+      post: { select: { title: true, category: true, org: { select: { name: true, type: true } } } },
+    },
+  });
+
+  const items = apps.map(({ review, reviewHidden, rating, student: lead, teammate, ...a }) => {
+    const partner = a.studentId === studentId ? teammate : lead;
+    return {
+      ...a,
+      rating: reviewHidden ? null : rating,
+      review: reviewHidden ? null : review,
+      partner: partner ? { id: partner.id, name: partner.user.name } : null,
+    };
+  });
+
+  return {
+    student,
+    current: items.filter((i) => i.status === "IN_PROGRESS"),
+    completed: items.filter((i) => i.status === "COMPLETED"),
+    stats: await getStudentStats(studentId),
+  };
+}
+
+export async function getLandingStats() {
+  const [orgs, completed, students, latest] = await Promise.all([
+    prisma.org.count({ where: { status: "APPROVED" } }),
+    prisma.application.count({ where: { status: "COMPLETED" } }),
+    prisma.student.count(),
+    prisma.application.findFirst({
+      where: { status: "COMPLETED", completedBy: "ORG", reviewHidden: false, review: { not: null } },
+      orderBy: { completedAt: "desc" },
+      select: {
+        rating: true,
+        review: true,
+        completedAt: true,
+        teammateId: true,
+        student: { select: { id: true, user: { select: { name: true } } } },
+        teammate: { select: { user: { select: { name: true } } } },
+        post: { select: { title: true, org: { select: { name: true, type: true, contactName: true } } } },
+      },
+    }),
+  ]);
+  return { orgs, completed, students, latest };
+}

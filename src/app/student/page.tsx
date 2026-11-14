@@ -12,6 +12,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { DoneForm, ReportForm, SummaryEditForm } from "@/components/work-forms";
 
 const GROUPS = [
   { title: "Applied", statuses: ["APPLIED"] },
@@ -32,6 +33,9 @@ export default async function StudentPage() {
       status: true,
       createdAt: true,
       acceptedAt: true,
+      doneRequestedAt: true,
+      completedAt: true,
+      studentSummary: true,
       studentId: true,
       student: { select: { user: { select: { name: true } } } },
       teammate: { select: { user: { select: { name: true } } } },
@@ -113,6 +117,24 @@ export default async function StudentPage() {
                               </div>
                             )}
 
+                            {a.status === "IN_PROGRESS" && !a.doneRequestedAt && (
+                              <div className="mt-4 border-t border-stone-100 pt-4">
+                                <DoneForm appId={a.id} />
+                              </div>
+                            )}
+
+                            {a.studentSummary && (a.status === "IN_PROGRESS" || a.status === "COMPLETED") && (
+                              <div className="mt-4 space-y-2 border-t border-stone-100 pt-4">
+                                <p className="text-xs text-stone-500">
+                                  {a.status === "COMPLETED"
+                                    ? `Completed ${formatDate(a.completedAt)}`
+                                    : `Marked done ${formatDate(a.doneRequestedAt)}. Waiting for the organization.`}
+                                </p>
+                                <p className="text-sm whitespace-pre-line text-stone-700">{a.studentSummary}</p>
+                                <SummaryEditForm appId={a.id} summary={a.studentSummary} />
+                              </div>
+                            )}
+
                             {a.status === "APPLIED" && (
                               <form action={(isLead ? withdraw : leaveTeam).bind(null, a.id)} className="mt-3">
                                 <SubmitButton variant="secondary" size="sm" pendingText="Saving">
@@ -120,6 +142,10 @@ export default async function StudentPage() {
                                 </SubmitButton>
                               </form>
                             )}
+
+                            <div className="mt-4">
+                              <ReportForm appId={a.id} />
+                            </div>
                           </Card>
                         </li>
                       );

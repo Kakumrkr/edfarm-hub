@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Clock, Hammer, Users } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, Hammer, Users } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { CATEGORIES, CONTACT_LINE, type Category } from "@/lib/constants";
@@ -15,6 +15,9 @@ import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { Stars } from "@/components/ui/stars";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { CompleteForm } from "@/components/work-forms";
 
 export default async function OrgPostPage({ params }: PageProps<"/org/posts/[id]">) {
   const user = await requireUser(["ORG"]);
@@ -23,7 +26,7 @@ export default async function OrgPostPage({ params }: PageProps<"/org/posts/[id]
     where: { id },
     include: {
       applications: {
-        where: { status: { in: ["APPLIED", "IN_PROGRESS"] } },
+        where: { status: { in: ["APPLIED", "IN_PROGRESS", "COMPLETED"] } },
         orderBy: { createdAt: "asc" },
         include: { student: { select: memberSelect }, teammate: { select: memberSelect } },
       },
@@ -49,6 +52,7 @@ export default async function OrgPostPage({ params }: PageProps<"/org/posts/[id]
   );
   const applied = apps.filter((a) => a.status === "APPLIED");
   const inProgress = apps.filter((a) => a.status === "IN_PROGRESS");
+  const completed = apps.filter((a) => a.status === "COMPLETED");
   const skills = csvToList(post.skills);
 
   return (
@@ -181,6 +185,74 @@ export default async function OrgPostPage({ params }: PageProps<"/org/posts/[id]
                     <MemberRow m={a.lead} role={a.mate ? "Lead" : undefined} showEmail />
                     {a.mate && <MemberRow m={a.mate} role="Teammate" showEmail />}
                   </div>
+                  {a.doneRequestedAt && (
+                    <div className="mt-5 rounded-xl bg-emerald-50/60 px-4 py-3 text-sm">
+                      <p className="font-medium text-stone-900">Marked done on {formatDate(a.doneRequestedAt)}</p>
+                      {a.studentSummary && (
+                        <p className="mt-1 whitespace-pre-line text-stone-700">{a.studentSummary}</p>
+                      )}
+                    </div>
+                  )}
+                  <div className="mt-5 border-t border-stone-100 pt-4">
+                    <CardTitle className="mb-1 text-base">Mark completed</CardTitle>
+                    <p className="mb-3 text-sm text-stone-500">
+                      Confirms the work on each member&apos;s public profile. You can do this even if they haven&apos;t
+                      marked done.
+                    </p>
+                    <CompleteForm appId={a.id} />
+                  </div>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-8">
+        <CardTitle className="mb-3">Completed ({completed.length})</CardTitle>
+        {completed.length === 0 ? (
+          <EmptyState icon={CheckCircle2} title="Nothing completed yet">
+            Finished work shows here and on each member&apos;s public profile.
+          </EmptyState>
+        ) : (
+          <ul className="space-y-4">
+            {completed.map((a) => (
+              <li key={a.id}>
+                <Card>
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <VerifiedBadge label="Completed" />
+                    <span className="text-sm text-stone-500">{formatDate(a.completedAt)}</span>
+                    {a.rating != null && <Stars value={a.rating} />}
+                  </div>
+                  <p className="font-medium text-stone-900">
+                    <Link href={`/s/${a.lead.id}`} className="hover:text-emerald-800">
+                      {a.lead.user.name}
+                    </Link>
+                    {a.mate && (
+                      <>
+                        {" and "}
+                        <Link href={`/s/${a.mate.id}`} className="hover:text-emerald-800">
+                          {a.mate.user.name}
+                        </Link>
+                      </>
+                    )}
+                  </p>
+                  <p className="mt-1 text-sm text-stone-500">{CONTACT_LINE}</p>
+                  <p className="mt-1 text-sm">
+                    <a href={`mailto:${a.lead.user.email}`} className="text-emerald-700 hover:text-emerald-800">
+                      {a.lead.user.email}
+                    </a>
+                    {a.mate && (
+                      <>
+                        {", "}
+                        <a href={`mailto:${a.mate.user.email}`} className="text-emerald-700 hover:text-emerald-800">
+                          {a.mate.user.email}
+                        </a>
+                      </>
+                    )}
+                  </p>
+                  {a.review && <p className="mt-3 text-sm whitespace-pre-line text-stone-700">“{a.review}”</p>}
+                  {a.reviewHidden && <p className="mt-1 text-xs text-stone-500">Review hidden by Ed Farm.</p>}
                 </Card>
               </li>
             ))}

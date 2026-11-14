@@ -1,11 +1,11 @@
 # EdFarm Hub (was SideQuest BHM): status
 
-## Latest: 12:55 PM CST
+## Latest: 1:07 PM CST
 
-- **Done:** S1 (12:47), S2 (fd4128a at 12:53). Typecheck passes.
-- **Next:** S3, target end ~1:15 (plan 1:33).
-- **Pace:** about 20 min ahead. If this holds, full scope (S5 + S6) fits.
-- Git identity for this repo now Kakumrkr (local config, from S2 commit on).
+- **Done:** S1 (12:47), S2 (12:53), S3 (94b9b3d at 13:06). Typecheck passes.
+- **Next:** A1 rename → push to GitHub (Kakumrkr/edfarm-hub, private) → S4, target end ~1:27 (plan 1:53).
+- **Pace:** about 25 min ahead. Full scope (S5 + S6) fits.
+- Git: commits as Kakumrkr. Repo pushed to github.com/Kakumrkr/edfarm-hub (private, 1:10). Rule: no Claude co-author line in commits; old ones get cleaned once at the end (see Decisions).
 
 ### Target clock (S1 started 12:38)
 
@@ -13,11 +13,11 @@
 |---|---|---|
 | S1 Foundation (20) | 12:58 | 12:47 ✅ |
 | S2 Orgs/admin/posts (15) | 1:13 | 12:53 ✅ |
-| S3 Students/apply/accept (20) | 1:33 | |
+| S3 Students/apply/accept (20) | 1:33 | 1:06 ✅ |
 | S4 Complete/review/profiles/landing (20) | 1:53 | |
 | **Checkpoint: core loop works** | **2:00** | |
 | S5 Admin trust tools (10) | 2:03 | |
-| S6 AI + polish (10) | 2:13 | |
+| S6 Polish only, AI cut (5-10) | 2:13 | |
 | S7 QA + db reset (10) | 2:23 → must be 2:15 | |
 | Freeze | 2:20 | |
 | Deadline | 2:35 | |
@@ -25,12 +25,13 @@
 The plan as written overshoots the 2:15 QA target by about 8 min (more with `/clear` gaps). Something in S5/S6 has to give.
 
 ### Risks
-1. **No AI key in `.env`** (only DATABASE_URL, SESSION_SECRET, DEMO_MODE). S6 AI draft will be skipped, so demo step 2 is a manual post. To keep AI in: add `ANTHROPIC_API_KEY=...` to `.env` before S6 starts. You do this, not the builder.
+1. AI post draft: CUT by decision at 1:12 (core loop matters more). No key in .env, so S6 skips it automatically. S6 = polish only.
 2. Schedule is 8 min over at full scope (see above).
 3. Seed is large (6 orgs, 4 students, 6 posts, resumes). If `db:reset` fails at the end of S1, fix it before moving on. Every later session depends on it.
 
 ### Decisions
-- Default plan: S6 = polish only (no AI) unless a key is added. That saves ~5 min.
+- S6 = polish only. AI draft is cut (1:12 decision).
+- Commit trailers: builder stops adding "Co-Authored-By: Claude" from S4 on. After the final "demo ready" commit (~2:18), strip the trailer from old commits once and force-push. Not mid-build.
 - At the 1:53 checkpoint: S4 done by 1:53 → run S5, then S6 polish only if it's before 2:05. S4 done after 2:00 → skip S5 and S6, go straight to S7.
 - Cut order (PLAN §10): S6 AI → S5 flags → S5 hide review → S5 close stale → landing polish. Never cut the core loop.
 
@@ -43,7 +44,6 @@ Before you start: `npm run db:reset`, open the app at `/login`, password for eve
 
 1. **Admin (0:00–0:30).** Quick-login "Ed Farm admin". Pending orgs: Magic City Youth Chess shows "Domain matches", approve it. QuickCash shows "Domain mismatch", reject it. Say: "Only real orgs get in."
 2. **Org (0:30–1:00).** Quick-login Brightloop. New post: title "Test our iPhone rebooking feature", category iOS app testing, 2 positions, 4 hours, Stipend "$150 stipend", beginner-friendly, tick the safety box, publish. Point out: startups can't pick Volunteer.
-   - *If AI is built:* paste "need a couple people to test the new rebooking feature on our iPhone app before Friday" → Draft with AI → set compensation → publish.
 3. **Student (1:00–1:25).** Quick-login Jordan. Browse → open the post → apply with teammate `priya@student.demo` + short note.
 4. **Org (1:25–1:55).** Brightloop → the post → Applicants: Jordan + Priya, "Team of 2", Ed Farm verified achievements, resume links. Accept → In progress, emails shown, post now FILLED.
 5. **Student (1:55–2:15).** Jordan → "We're done" + one-line summary.

@@ -148,3 +148,113 @@ export async function decline(appId: string) {
   await prisma.application.update({ where: { id }, data: { status: "DECLINED" } });
   refresh(app.postId);
 }
+
+const summarySchema = z
+  .string()
+  .trim()
+  .min(20, "Summary: at least 20 characters. Say what you did and how.")
+  .max(400, "Summary: 400 characters max.");
+
+async function memberApp(appId: string, studentId: string | undefined) {
+  const id = idSchema.safeParse(appId);
+  if (!id.success || !studentId) return null;
+  const app = await prisma.application.findUnique({
+    where: { id: id.data },
+    select: { id: true, status: true, postId: true, studentId: true, teammateId: true, post: { select: { orgId: true } } },
+  });
+  if (!app || (app.studentId !== studentId && app.teammateId !== studentId)) return null;
+  return app;
+}
+
+function refreshProfiles(app: { studentId: string; teammateId: string | null }) {
+  revalidatePath(`/s/${app.studentId}`);
+  if (app.teammateId) revalidatePath(`/s/${app.teammateId}`);
+  revalidatePath("/");
+}
+
+/** R10: lead or teammate on IN_PROGRESS marks done with a summary. */
+export async function markDone(appId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireUser(["STUDENT"]);
+  const app = await memberApp(appId, user.student?.id);
+  if (!app) return { ok: false, error: "Project not found." };
+  if (app.status !== "IN_PROGRESS") return { ok: false, error: "Only in-progress work can be marked done." };
+  const summary = summarySchema.safeParse(formData.get("summary") ?? "");
+  if (!summary.success) return { ok: false, error: summary.error.issues[0]?.message ?? "Check the summary." };
+  await prisma.application.update({
+    where: { id: app.id },
+    data: { doneRequestedAt: new Date(), studentSummary: summary.data },
+  });
+  refresh(app.postId);
+  return { ok: true };
+}
+
+/** R10: either member edits the summary while IN_PROGRESS or COMPLETED. */
+export async function updateSummary(appId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireUser(["STUDENT"]);
+  const app = await memberApp(appId, user.student?.id);
+  if (!app) return { ok: false, error: "Project not found." };
+  if (app.status !== "IN_PROGRESS" && app.status !== "COMPLETED")
+    return { ok: false, error: "This summary can't be edited anymore." };
+  const summary = summarySchema.safeParse(formData.get("summary") ?? "");
+  if (!summary.success) return { ok: false, error: summary.error.issues[0]?.message ?? "Check the summary." };
+  await prisma.application.update({ where: { id: app.id }, data: { studentSummary: summary.data } });
+  refresh(app.postId);
+  refreshProfiles(app);
+  return { ok: true };
+}
+
+const completeSchema = z.object({
+  rating: z.union([z.literal(""), z.coerce.number().int().min(1).max(5)]).default(""),
+  review: z.string().trim().max(600, "Review: 600 characters max.").default(""),
+});
+
+/** R11: owner marks IN_PROGRESS work completed, with optional rating and review. */
+export async function complete(appId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireUser(["ORG"]);
+  const id = idSchema.safeParse(appId);
+  if (!id.success || !user.org) return { ok: false, error: "Project not found." };
+  const parsed = completeSchema.safeParse({
+    rating: formData.get("rating") ?? "",
+    review: formData.get("review") ?? "",
+  });
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check the form." };
+  const app = await prisma.application.findUnique({
+    where: { id: id.data },
+    select: { id: true, status: true, postId: true, studentId: true, teammateId: true, post: { select: { orgId: true } } },
+  });
+  if (!app || app.post.orgId !== user.org.id) return { ok: false, error: "Project not found." };
+  if (app.status !== "IN_PROGRESS") return { ok: false, error: "Only in-progress work can be completed." };
+  const { rating, review } = parsed.data;
+  await prisma.application.update({
+    where: { id: app.id },
+    data: {
+      status: "COMPLETED",
+      completedAt: new Date(),
+      completedBy: "ORG",
+      rating: rating === "" ? null : rating,
+      review: review || null,
+    },
+  });
+  refresh(app.postId);
+  refreshProfiles(app);
+  return { ok: true };
+}
+
+/** R14: lead or teammate reports the org on one of their applications. */
+export async function reportOrg(appId: string, _prev: FormState, formData: FormData): Promise<FormState> {
+  const user = await requireUser(["STUDENT"]);
+  const app = await memberApp(appId, user.student?.id);
+  if (!app || !user.student) return { ok: false, error: "Project not found." };
+  const reason = z
+    .string()
+    .trim()
+    .min(10, "Reason: at least 10 characters.")
+    .max(500, "Reason: 500 characters max.")
+    .safeParse(formData.get("reason") ?? "");
+  if (!reason.success) return { ok: false, error: reason.error.issues[0]?.message ?? "Check the reason." };
+  await prisma.flag.create({
+    data: { orgId: app.post.orgId, studentId: user.student.id, applicationId: app.id, reason: reason.data },
+  });
+  revalidatePath("/admin/flags");
+  return { ok: true };
+}
