@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EdFarm Hub
 
-## Getting Started
+EdFarm Hub connects Ed Farm learners with small, real tech projects from Birmingham startups and nonprofits, like app testing, accessibility audits and small website fixes.
 
-First, run the development server:
+**Who it helps.** Learners who have training and certifications but no work history, and local orgs that need small tech jobs done but have no time or budget to find help.
+
+**How it works.** Ed Farm staff approve each organization (with an email-vs-website domain check) and add verified achievements to learner profiles. Approved orgs post projects; startups must offer pay or a stipend, nonprofits may post volunteer work. Learners apply alone or with one teammate. The org reviews achievements and resumes, accepts, and the work happens over email. When it's done, the learner writes a short summary and the org marks it complete with a rating and review. The finished project shows up on every team member's public profile, marked "Verified by Ed Farm". Students can report an org, and Ed Farm can suspend it or close stalled work.
+
+**Ed Farm tie-in.** Ed Farm is the trust layer: it vouches for the organizations and the training, and the orgs vouch for the work.
+
+## Ed Farm records sync
+
+When a student signs up with an email found in Ed Farm's learner records, their completed Ed Farm courses are added to their profile as verified achievements, their cohort is filled in, and their current Ed Farm program is shown on their profile. In this prototype the records are a read-only mock file (`src/lib/edfarm-records.ts`); in production this would be an API call to Ed Farm. Signup works the same if no record matches. Try it by registering `brahma@student.demo`.
+
+## Tech stack
+
+Next.js 16 (App Router, Server Actions), React 19, TypeScript, Tailwind CSS 4, Prisma 6 with SQLite, custom JWT session auth (jose + bcryptjs), zod validation.
+
+## How to run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env    # then set SESSION_SECRET to a long random string
+npm run db:reset        # create the SQLite database and load sample data
+npm run dev             # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Demo logins (password `demo1234`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Role | Login |
+|---|---|
+| Ed Farm admin | coach@edfarm.demo |
+| Startup (approved) | founder@brightloop.demo |
+| Nonprofit (approved) | hello@northsidepantry.demo |
+| Nonprofit (pending, domain matches) | coach@mcyouthchess.demo |
+| Startup (pending, domain mismatch) | quickcash.jobs@freemail.demo |
+| Student (new) | jordan@student.demo |
+| Student (teammate) | priya@student.demo |
+| Student (experienced) | aaliyah@student.demo |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What's next
 
-## Learn More
+Pilot with one cohort, email notifications, and syncing achievements from Ed Farm's own records instead of a mock file.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Hackathon prototype with fictional sample data, not an official Ed Farm product.
