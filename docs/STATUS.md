@@ -1,10 +1,10 @@
 # EdFarm Hub (was SideQuest BHM): status
 
-## Latest: 1:25 PM CST
+## Latest: 1:29 PM CST
 
-- **Done:** S1 (12:47), S2 (12:53), S3 (1:06), rename (bacf286), S4 (1:17), S5 (75d27a5 at 1:21). Core loop + admin tools built. Typecheck passes.
-- **Next:** S6 polish only (target ~1:40), S7 QA (target ~1:50).
-- **Pace:** about 40 min ahead of plan. Nothing to cut. Spare time goes to rehearsal, not new features.
+- **Done:** S1 (12:47), S2 (12:53), S3 (1:06), rename (bacf286), S4 (1:17), S5 (1:21), S6 polish (ae3b13c at 1:26, AI skipped). All build sessions done. Typecheck passes.
+- **Next:** S7 QA (target ~1:40) → full test pass → fixes → rehearse x2 → freeze 2:20.
+- **Pace:** about 45 min ahead of plan. Nothing to cut. Spare time goes to rehearsal, not new features.
 - Git: commits as Kakumrkr. Repo pushed to github.com/Kakumrkr/edfarm-hub (private, 1:10). Rule: no Claude co-author line in commits; old ones get cleaned once at the end (see Decisions).
 
 ### Target clock (S1 started 12:38)
@@ -17,7 +17,7 @@
 | S4 Complete/review/profiles/landing (20) | 1:53 | 1:17 ✅ |
 | **Checkpoint: core loop works** | **2:00** | |
 | S5 Admin trust tools (10) | 2:03 | 1:21 ✅ |
-| S6 Polish only, AI cut (5-10) | 2:13 | |
+| S6 Polish only, AI cut (5-10) | 2:13 | 1:26 ✅ |
 | S7 QA + db reset (10) | 2:23 → must be 2:15 | |
 | Freeze | 2:20 | |
 | Deadline | 2:35 | |
@@ -80,3 +80,35 @@ Backup if a step breaks live: skip to Aaliyah's public profile (seeded, always w
 **What's next.** Pilot with one cohort, email notifications, and syncing achievements from Ed Farm's own records.
 
 *All data in the demo is fictional sample data. Hackathon prototype, not an official Ed Farm product.*
+
+---
+
+## Full test pass (~15 min, run during S6)
+
+Start: stop dev → `npm run db:reset` → `npm run dev` → http://localhost:3000. Password for all: `demo1234`. Note anything broken as: page, what you did, what you saw.
+
+**A. Public + accounts**
+1. `/` landing: hero, 3 steps, counts with "sample data", disclaimer footer. Check at phone width (browser devtools, 390px).
+2. `/register` → Student: register a new student → lands on `/student/profile`. Upload a PDF resume (<2 MB). Try a non-PDF: should be refused.
+3. Log out → `/login` with a wrong password: friendly error, no crash.
+
+**B. Admin (quick-login Ed Farm admin)**
+4. `/admin`: pending first. Magic City "Domain matches", QuickCash "Domain mismatch". Approve Magic City, reject QuickCash with a note.
+5. Students, Engagements, Reports pages load and each list has content or an empty state.
+
+**C. Org (Brightloop)**
+6. New post: Volunteer not offered; publish without safety box → error; with it → post created. Fill: iOS app testing, 2 positions, Stipend "$150 stipend".
+7. Log in as `quickcash.jobs@freemail.demo`: rejected banner + note, no New post button.
+
+**D. Student team flow (the demo)**
+8. Jordan → Browse → filters (category, beginner-friendly, compensation) work → open Brightloop's new post → apply with `priya@student.demo` + note.
+9. Priya → `/student`: same application, role Teammate, "Leave team" button (don't click).
+10. Brightloop → post → applicants: team of 2, achievements, both resume links open PDFs → Accept → In progress with emails, post FILLED.
+11. Jordan → "We're done" + summary. Brightloop → Mark completed, 5★ + review.
+12. Jordan's `/s/[id]`: project, stars, review, "Team project with Priya" → click → Priya's profile shows it. No email or resume anywhere. Copy-link button works.
+
+**E. Security spot checks (logged in as Jordan)**
+13. Visit `/admin` and `/org`: should redirect to Jordan's own dashboard.
+14. Open someone else's resume URL (`/api/resume/<Marcus's id>`, copy it from an org applicant card): should be 403.
+
+After the test: `npm run db:reset` again so the demo starts clean.
