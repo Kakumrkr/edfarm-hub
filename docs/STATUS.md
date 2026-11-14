@@ -1,9 +1,9 @@
 # EdFarm Hub (was SideQuest BHM): status
 
-## Latest: 1:29 PM CST
+## Latest: 1:34 PM CST
 
-- **Done:** S1 (12:47), S2 (12:53), S3 (1:06), rename (bacf286), S4 (1:17), S5 (1:21), S6 polish (ae3b13c at 1:26, AI skipped). All build sessions done. Typecheck passes.
-- **Next:** S7 QA (target ~1:40) → full test pass → fixes → rehearse x2 → freeze 2:20.
+- **Done:** S1 (12:47), S2 (12:53), S3 (1:06), rename (bacf286), S4 (1:17), S5 (1:21), S6 (1:26), S7 QA (ff12570 at 1:32: access-guard + demo-check clean, build passes). db:reset left for user. Typecheck passes.
+- **Next:** db:reset → full test pass → fixes → rehearse x2 → freeze 2:20.
 - **Pace:** about 45 min ahead of plan. Nothing to cut. Spare time goes to rehearsal, not new features.
 - Git: commits as Kakumrkr. Repo pushed to github.com/Kakumrkr/edfarm-hub (private, 1:10). Rule: no Claude co-author line in commits; old ones get cleaned once at the end (see Decisions).
 
@@ -18,7 +18,7 @@
 | **Checkpoint: core loop works** | **2:00** | |
 | S5 Admin trust tools (10) | 2:03 | 1:21 ✅ |
 | S6 Polish only, AI cut (5-10) | 2:13 | 1:26 ✅ |
-| S7 QA + db reset (10) | 2:23 → must be 2:15 | |
+| S7 QA + db reset (10) | 2:23 → must be 2:15 | 1:32 ✅ |
 | Freeze | 2:20 | |
 | Deadline | 2:35 | |
 
@@ -34,6 +34,7 @@ The plan as written overshoots the 2:15 QA target by about 8 min (more with `/cl
 - Commit trailers: builder stops adding "Co-Authored-By: Claude" from S4 on. After the final "demo ready" commit (~2:18), strip the trailer from old commits once and force-push. Not mid-build.
 - At the 1:53 checkpoint: S4 done by 1:53 → run S5, then S6 polish only if it's before 2:05. S4 done after 2:00 → skip S5 and S6, go straight to S7.
 - Cut order (PLAN §10): S6 AI → S5 flags → S5 hide review → S5 close stale → landing polish. Never cut the core loop.
+- S7 minor notes left unfixed (1:34): some actions throw on bad IDs; double-click Apply could duplicate (low risk: SubmitButton disables while pending). Not demo-breaking. Fix only if time after full test.
 
 ---
 
