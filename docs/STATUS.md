@@ -1,16 +1,17 @@
 # SideQuest BHM: status
 
-## Latest: 12:41 PM CST
+## Latest: 12:49 PM CST
 
-- **Done:** nothing committed yet (only `starter kit`).
-- **In progress:** Session 1, about 3 min in. Already there: deps installed, scripts, `.env`, `src/lib/*` (6 files), `prisma/seed.ts`, `dev.db`. Still to do: UI kit (`src/components/ui`), shell/header, `/login`, placeholder pages, commit.
-- **Pace:** on time to slightly ahead.
+- **Done:** S1 (commit faafd76 at 12:47, typecheck passes).
+- **Next:** S2, target end 1:03 (plan 1:13).
+- **Pace:** about 10 min ahead.
+- Git identity for this repo now Kakumrkr (local config, from S2 commit on).
 
 ### Target clock (S1 started 12:38)
 
 | Session | Plan end | Actual end |
 |---|---|---|
-| S1 Foundation (20) | 12:58 | |
+| S1 Foundation (20) | 12:58 | 12:47 ✅ |
 | S2 Orgs/admin/posts (15) | 1:13 | |
 | S3 Students/apply/accept (20) | 1:33 | |
 | S4 Complete/review/profiles/landing (20) | 1:53 | |

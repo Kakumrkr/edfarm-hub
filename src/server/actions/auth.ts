@@ -48,3 +48,51 @@ export async function logout() {
   await destroySession();
   redirect("/login");
 }
+
+const orgSchema = z.object({
+  name: z.string().trim().min(2, "Enter the organization name.").max(100),
+  type: z.enum(["STARTUP", "NONPROFIT"], "Choose startup or nonprofit."),
+  website: z
+    .string()
+    .trim()
+    .min(4, "Enter your website.")
+    .max(200)
+    .transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`))
+    .pipe(z.url("Enter a valid website.")),
+  contactName: z.string().trim().min(2, "Enter a contact name.").max(100),
+  description: z.string().trim().min(20, "Describe your organization (20+ characters).").max(1000),
+  email: z.string().trim().toLowerCase().email("Enter a valid email."),
+  password: z.string().min(8, "Password needs at least 8 characters.").max(200),
+});
+
+/** R1: creates User ORG + Org PENDING, logs in, goes to /org. */
+export async function registerOrg(_prev: FormState, formData: FormData): Promise<FormState> {
+  const parsed = orgSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check your details." };
+  const d = parsed.data;
+
+  const exists = await prisma.user.findUnique({ where: { email: d.email } });
+  if (exists) return { ok: false, error: "An account with this email already exists." };
+
+  const user = await prisma.user.create({
+    data: {
+      email: d.email,
+      passwordHash: await bcrypt.hash(d.password, 10),
+      role: "ORG",
+      name: d.contactName,
+      org: {
+        create: {
+          name: d.name,
+          type: d.type,
+          website: d.website,
+          contactName: d.contactName,
+          description: d.description,
+          status: "PENDING",
+        },
+      },
+    },
+  });
+
+  await createSession({ userId: user.id, role: "ORG" });
+  redirect("/org");
+}
