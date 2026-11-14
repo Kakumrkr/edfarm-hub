@@ -96,3 +96,41 @@ export async function registerOrg(_prev: FormState, formData: FormData): Promise
   await createSession({ userId: user.id, role: "ORG" });
   redirect("/org");
 }
+
+const studentSchema = z.object({
+  name: z.string().trim().min(2, "Enter your name.").max(100),
+  email: z.string().trim().toLowerCase().email("Enter a valid email."),
+  password: z.string().min(8, "Password needs at least 8 characters.").max(200),
+  cohort: z.string().trim().max(60).default(""),
+  skills: z.string().trim().max(300).default(""),
+  bio: z.string().trim().max(600).default(""),
+});
+
+/** Creates User STUDENT + Student, logs in, goes to /student/profile. */
+export async function registerStudent(_prev: FormState, formData: FormData): Promise<FormState> {
+  const parsed = studentSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Check your details." };
+  const d = parsed.data;
+
+  const exists = await prisma.user.findUnique({ where: { email: d.email } });
+  if (exists) return { ok: false, error: "An account with this email already exists." };
+
+  const user = await prisma.user.create({
+    data: {
+      email: d.email,
+      passwordHash: await bcrypt.hash(d.password, 10),
+      role: "STUDENT",
+      name: d.name,
+      student: {
+        create: {
+          cohort: d.cohort,
+          skills: d.skills.split(",").map((s) => s.trim()).filter(Boolean).join(", "),
+          bio: d.bio,
+        },
+      },
+    },
+  });
+
+  await createSession({ userId: user.id, role: "STUDENT" });
+  redirect("/student/profile");
+}

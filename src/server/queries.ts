@@ -31,3 +31,27 @@ export async function getOrgDashboard(orgId: string) {
     seats: countSeats(p.applications),
   }));
 }
+
+/** Completed count, avg visible rating (R13), distinct orgs. Counts lead + teammate applications. */
+export async function getStudentStats(studentId: string) {
+  const apps = await prisma.application.findMany({
+    where: { status: "COMPLETED", OR: [{ studentId }, { teammateId: studentId }] },
+    select: { rating: true, reviewHidden: true, post: { select: { orgId: true } } },
+  });
+  const ratings = apps.filter((a) => a.rating != null && !a.reviewHidden).map((a) => a.rating!);
+  return {
+    completed: apps.length,
+    avgRating: ratings.length ? ratings.reduce((s, r) => s + r, 0) / ratings.length : null,
+    orgs: new Set(apps.map((a) => a.post.orgId)).size,
+  };
+}
+
+/** Fields an org sees about an applicant. Email is selected but only rendered per R8. */
+export const memberSelect = {
+  id: true,
+  cohort: true,
+  skills: true,
+  resumeName: true,
+  user: { select: { name: true, email: true } },
+  achievements: { select: { id: true, title: true }, orderBy: { awardedAt: "desc" as const } },
+} as const;

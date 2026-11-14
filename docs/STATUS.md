@@ -1,10 +1,10 @@
-# SideQuest BHM: status
+# EdFarm Hub (was SideQuest BHM): status
 
-## Latest: 12:49 PM CST
+## Latest: 12:55 PM CST
 
-- **Done:** S1 (commit faafd76 at 12:47, typecheck passes).
-- **Next:** S2, target end 1:03 (plan 1:13).
-- **Pace:** about 10 min ahead.
+- **Done:** S1 (12:47), S2 (fd4128a at 12:53). Typecheck passes.
+- **Next:** S3, target end ~1:15 (plan 1:33).
+- **Pace:** about 20 min ahead. If this holds, full scope (S5 + S6) fits.
 - Git identity for this repo now Kakumrkr (local config, from S2 commit on).
 
 ### Target clock (S1 started 12:38)
@@ -12,7 +12,7 @@
 | Session | Plan end | Actual end |
 |---|---|---|
 | S1 Foundation (20) | 12:58 | 12:47 ✅ |
-| S2 Orgs/admin/posts (15) | 1:13 | |
+| S2 Orgs/admin/posts (15) | 1:13 | 12:53 ✅ |
 | S3 Students/apply/accept (20) | 1:33 | |
 | S4 Complete/review/profiles/landing (20) | 1:53 | |
 | **Checkpoint: core loop works** | **2:00** | |
@@ -53,7 +53,7 @@ Before you start: `npm run db:reset`, open the app at `/login`, password for eve
 Backup if a step breaks live: skip to Aaliyah's public profile (seeded, always works) and talk through the loop.
 
 ### 30-second pitch
-"Ed Farm learners finish with certifications but no real work history, and Birmingham startups and nonprofits need small tech jobs done. SideQuest BHM connects them with trust on both sides: Ed Farm vouches for the orgs and the training, orgs vouch for the work. Learners can team up, and every finished project becomes a verified track record the next employer can see."
+"Ed Farm learners finish with certifications but no real work history, and Birmingham startups and nonprofits need small tech jobs done. EdFarm Hub connects them with trust on both sides: Ed Farm vouches for the orgs and the training, orgs vouch for the work. Learners can team up, and every finished project becomes a verified track record the next employer can see."
 
 ### Judge Q&A (short answers)
 - **How is this different from Riipen / Upwork?** Riipen is built around college courses and credit; Upwork is an open market. This is local, small projects for Ed Farm cohorts, with Ed Farm staff approving every org.
@@ -67,7 +67,7 @@ Backup if a step breaks live: skip to Aaliyah's public profile (seeded, always w
 - **What's next?** Pilot with one Ed Farm cohort and a handful of partner orgs; email notifications; Ed Farm achievements synced from their records instead of typed in.
 
 ### Submission description
-**SideQuest BHM** connects Ed Farm learners with small, real tech projects from Birmingham startups and nonprofits, like app testing, accessibility audits and small website fixes.
+**EdFarm Hub** connects Ed Farm learners with small, real tech projects from Birmingham startups and nonprofits, like app testing, accessibility audits and small website fixes.
 
 **Who it helps.** Learners who have training and certifications but no work history, and local orgs that need small tech jobs done but have no time or budget to find help.
 
