@@ -1,4 +1,4 @@
-export const APP_NAME = "SideQuest BHM";
+export const APP_NAME = "EdFarm Hub";
 export const DEMO_MODE = process.env.DEMO_MODE === "true";
 export const AI_ENABLED = Boolean(process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY);
 

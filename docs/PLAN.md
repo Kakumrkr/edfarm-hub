@@ -1,4 +1,4 @@
-# SideQuest BHM: build plan
+# EdFarm Hub: build plan
 
 Build a Better Birmingham hackathon. Community partner: Ed Farm. Total time: about 2 hours.
 
@@ -232,7 +232,7 @@ Then you: run section 9 twice in the browser. Run `npm run db:reset` right befor
 6. **Org**. Mark completed, 5 stars, short review.
 7. **Public profile** of Jordan: the verified project with "Team project with Priya" → click Priya: same project. Then open Aaliyah's profile: what a learner looks like after a few projects.
 
-**Pitch (30 s).** "Ed Farm learners finish with certifications but no real work history, and Birmingham startups and nonprofits need small tech jobs done. SideQuest BHM connects them with trust on both sides: Ed Farm vouches for the orgs and the training, orgs vouch for the work. Learners can team up, and every finished project becomes a verified track record the next employer can see."
+**Pitch (30 s).** "Ed Farm learners finish with certifications but no real work history, and Birmingham startups and nonprofits need small tech jobs done. EdFarm Hub connects them with trust on both sides: Ed Farm vouches for the orgs and the training, orgs vouch for the work. Learners can team up, and every finished project becomes a verified track record the next employer can see."
 
 **Q&A prep**
 - Riipen? Built mostly around college courses and credit. This is local, small projects for Ed Farm cohorts, run by Ed Farm staff.

@@ -1,4 +1,4 @@
-# SideQuest BHM (hackathon build, about 2 hours total)
+# EdFarm Hub (hackathon build, about 2 hours total)
 
 Ed Farm learners get real, verified project experience with Birmingham startups and nonprofits.
 - ADMIN (Ed Farm staff): approves orgs, adds verified Ed Farm achievements to students, moderates.
@@ -35,7 +35,7 @@ Start each session with `/session N` (see `.claude/skills/session`).
 - `src/lib/session.ts` createSession / getSession / destroySession (jose HS256, httpOnly cookie `sq_session`, 7 days)
 - `src/lib/auth.ts` getCurrentUser(), requireUser(roles?) (redirects to /login, or to the user's own dashboard on wrong role)
 - `src/lib/constants.ts` roles, statuses, categories, labels, badge tones (values in PLAN.md section 3)
-- `src/lib/config.ts` APP_NAME = "SideQuest BHM", DEMO_MODE, AI_ENABLED
+- `src/lib/config.ts` APP_NAME = "EdFarm Hub", DEMO_MODE, AI_ENABLED
 - `src/lib/format.ts` csvToList, listToCsv, emailDomain, websiteHost, domainsMatch, formatDate
 - `src/server/queries.ts` shared reads (seatsUsed, public profile, dashboards)
 - `src/server/actions/{auth,org,post,application,student,admin,ai}.ts`
