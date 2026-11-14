@@ -86,7 +86,7 @@ export default async function OrgPage() {
         <ul className="space-y-3">
           {posts.map((p) => (
             <li key={p.id}>
-              <Link href={`/org/posts/${p.id}`} className="block">
+              <Link href={`/org/posts/${p.id}`} className="block rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
                 <Card className="transition-colors hover:border-emerald-600/40">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">

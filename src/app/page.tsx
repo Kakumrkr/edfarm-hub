@@ -62,7 +62,7 @@ export default async function Home() {
 
         {/* The memorable thing: a real record from the DB, the way it appears on a profile */}
         {latest ? (
-          <figure className="relative">
+          <figure className="relative mr-3 mb-3">
             <div aria-hidden className="absolute inset-0 translate-x-3 translate-y-3 rounded-2xl border border-stone-200 bg-white/60" />
             <div className="relative rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between gap-3">
@@ -72,7 +72,7 @@ export default async function Home() {
               <p className="mt-4 text-sm text-stone-500">
                 {latest.post.org.name}, {ORG_TYPES[latest.post.org.type as OrgType] ?? latest.post.org.type}
               </p>
-              <p className="mt-1 text-lg font-semibold tracking-tight">{latest.post.title}</p>
+              <p className="mt-1 text-lg font-semibold tracking-tight text-balance">{latest.post.title}</p>
               {latest.rating != null && <Stars value={latest.rating} className="mt-3" />}
               <blockquote className="mt-3 border-l-2 border-amber-300 pl-4 leading-relaxed text-stone-800">
                 “{latest.review}”

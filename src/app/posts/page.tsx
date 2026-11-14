@@ -84,9 +84,9 @@ export default async function PostsPage({ searchParams }: PageProps<"/posts">) {
             const skills = csvToList(p.skills);
             return (
               <li key={p.id}>
-                <Link href={`/posts/${p.id}`} className="block h-full">
+                <Link href={`/posts/${p.id}`} className="block h-full rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
                   <Card className="h-full transition-colors hover:border-emerald-300">
-                    <p className="text-xs font-medium tracking-wide text-stone-500 uppercase">
+                    <p className="text-sm font-medium text-emerald-800">
                       {CATEGORIES[p.category as Category] ?? p.category}
                     </p>
                     <h2 className="mt-1 text-lg font-semibold tracking-tight text-stone-900">{p.title}</h2>
@@ -110,7 +110,7 @@ export default async function PostsPage({ searchParams }: PageProps<"/posts">) {
                         ))}
                       </div>
                     )}
-                    <div className="mt-4 flex gap-4 border-t border-stone-100 pt-3 text-sm text-stone-500">
+                    <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-stone-100 pt-3 text-sm text-stone-500">
                       <span className="inline-flex items-center gap-1">
                         <Users className="size-4" aria-hidden /> {left} of {p.positions} seats left
                       </span>

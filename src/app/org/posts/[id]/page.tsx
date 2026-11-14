@@ -130,7 +130,7 @@ export default async function OrgPostPage({ params }: PageProps<"/org/posts/[id]
                         Needs {size} seat{size > 1 ? "s" : ""} · applied {formatDate(a.createdAt)}
                       </span>
                     </div>
-                    <div className="space-y-5">
+                    <div className="divide-y divide-stone-100 [&>*]:py-4 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
                       <MemberRow m={a.lead} role={a.mate ? "Lead" : undefined} showEmail={false} />
                       {a.mate && <MemberRow m={a.mate} role="Teammate" showEmail={false} />}
                     </div>
@@ -181,7 +181,7 @@ export default async function OrgPostPage({ params }: PageProps<"/org/posts/[id]
                     <span className="text-sm text-stone-500">accepted {formatDate(a.acceptedAt)}</span>
                     {a.doneRequestedAt && <Badge tone="emerald">Students say done</Badge>}
                   </div>
-                  <div className="space-y-5">
+                  <div className="divide-y divide-stone-100 [&>*]:py-4 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0">
                     <MemberRow m={a.lead} role={a.mate ? "Lead" : undefined} showEmail />
                     {a.mate && <MemberRow m={a.mate} role="Teammate" showEmail />}
                   </div>

@@ -34,7 +34,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/s/[id]">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-stone-900">{name}</h1>
+              <h1 className="text-3xl font-semibold tracking-tight text-balance break-words text-stone-900">{name}</h1>
               <p className="mt-1 text-stone-500">Ed Farm learner{student.cohort ? `, ${student.cohort}` : ""}</p>
             </div>
             <CopyLinkButton />
@@ -101,7 +101,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/s/[id]">
                         {formatDate(c.completedAt)}
                       </time>
                     </div>
-                    <h3 className="mt-2 text-lg font-semibold tracking-tight">{c.post.title}</h3>
+                    <h3 className="mt-2 text-lg font-semibold tracking-tight text-balance">{c.post.title}</h3>
                     <p className="text-sm text-stone-500">{CATEGORIES[c.post.category as Category] ?? c.post.category}</p>
 
                     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -155,7 +155,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/s/[id]">
                   <li key={a.id} className="flex gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 px-4 py-3">
                     <ShieldCheck className="mt-0.5 size-5 shrink-0 text-emerald-700" aria-hidden />
                     <div className="min-w-0">
-                      <p className="font-medium text-stone-900">{a.title}</p>
+                      <p className="font-medium break-words text-stone-900">{a.title}</p>
                       {a.detail && <p className="text-sm text-stone-600">{a.detail}</p>}
                       <p className="mt-1 text-xs text-emerald-800">Verified by Ed Farm, {formatDate(a.awardedAt)}</p>
                     </div>

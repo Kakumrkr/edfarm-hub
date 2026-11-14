@@ -1,10 +1,10 @@
 # EdFarm Hub (was SideQuest BHM): status
 
-## Latest: 1:19 PM CST
+## Latest: 1:25 PM CST
 
-- **Done:** S1 (12:47), S2 (12:53), S3 (1:06), rename (bacf286), S4 (a9b4399 at 1:17). Core loop built. Typecheck passes.
-- **Next:** S5 admin tools (target ~1:30), then S6 polish only (target ~1:40), S7 QA (target ~1:50).
-- **Pace:** about 35 min ahead of plan. Nothing to cut. Spare time goes to rehearsal, not new features.
+- **Done:** S1 (12:47), S2 (12:53), S3 (1:06), rename (bacf286), S4 (1:17), S5 (75d27a5 at 1:21). Core loop + admin tools built. Typecheck passes.
+- **Next:** S6 polish only (target ~1:40), S7 QA (target ~1:50).
+- **Pace:** about 40 min ahead of plan. Nothing to cut. Spare time goes to rehearsal, not new features.
 - Git: commits as Kakumrkr. Repo pushed to github.com/Kakumrkr/edfarm-hub (private, 1:10). Rule: no Claude co-author line in commits; old ones get cleaned once at the end (see Decisions).
 
 ### Target clock (S1 started 12:38)
@@ -16,7 +16,7 @@
 | S3 Students/apply/accept (20) | 1:33 | 1:06 ✅ |
 | S4 Complete/review/profiles/landing (20) | 1:53 | 1:17 ✅ |
 | **Checkpoint: core loop works** | **2:00** | |
-| S5 Admin trust tools (10) | 2:03 | |
+| S5 Admin trust tools (10) | 2:03 | 1:21 ✅ |
 | S6 Polish only, AI cut (5-10) | 2:13 | |
 | S7 QA + db reset (10) | 2:23 → must be 2:15 | |
 | Freeze | 2:20 | |
