@@ -1,0 +1,130 @@
+// SideQuest BHM data model. SQLite has no enums or string lists, so
+// status/type fields are Strings validated in code (src/lib/constants.ts)
+// and skills are comma-separated Strings.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String // ADMIN | ORG | STUDENT
+  name         String
+  createdAt    DateTime @default(now())
+
+  org               Org?
+  student           Student?
+  achievementsAdded Achievement[] @relation("AchievementAddedBy")
+}
+
+model Org {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  type        String // STARTUP | NONPROFIT
+  website     String
+  contactName String
+  description String
+  status      String    @default("PENDING") // PENDING | APPROVED | REJECTED | SUSPENDED
+  adminNote   String?
+  reviewedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  posts Post[]
+  flags Flag[]
+}
+
+model Student {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio             String    @default("")
+  skills          String    @default("") // comma-separated
+  cohort          String    @default("")
+  resumeData      Bytes?
+  resumeName      String?
+  resumeUpdatedAt DateTime?
+  createdAt       DateTime  @default(now())
+
+  achievements     Achievement[]
+  applications     Application[] @relation("AppLead")
+  teamApplications Application[] @relation("AppTeammate")
+  flags            Flag[]
+}
+
+model Achievement {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title     String
+  detail    String   @default("")
+  awardedAt DateTime @default(now())
+  addedById String
+  addedBy   User     @relation("AchievementAddedBy", fields: [addedById], references: [id])
+}
+
+model Post {
+  id               String   @id @default(cuid())
+  orgId            String
+  org              Org      @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  title            String
+  description      String
+  category         String // key of CATEGORIES
+  skills           String   @default("") // comma-separated
+  positions        Int      @default(1)
+  compensationType String // PAID | STIPEND | UNPAID
+  compensationNote String   @default("")
+  estimatedHours   Int?
+  beginnerFriendly Boolean  @default(false)
+  aiDrafted        Boolean  @default(false)
+  status           String   @default("OPEN") // OPEN | FILLED | CLOSED
+  createdAt        DateTime @default(now())
+
+  applications Application[]
+}
+
+model Application {
+  id              String    @id @default(cuid())
+  postId          String
+  post            Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  studentId       String // the lead applicant
+  student         Student   @relation("AppLead", fields: [studentId], references: [id], onDelete: Cascade)
+  teammateId      String? // optional second student; the team uses 2 seats
+  teammate        Student?  @relation("AppTeammate", fields: [teammateId], references: [id], onDelete: SetNull)
+  note            String    @default("")
+  status          String    @default("APPLIED") // APPLIED | IN_PROGRESS | COMPLETED | DECLINED | WITHDRAWN | CANCELLED
+  createdAt       DateTime  @default(now())
+  acceptedAt      DateTime?
+  doneRequestedAt DateTime?
+  completedAt     DateTime?
+  completedBy     String? // ORG | ADMIN
+  rating          Int? // 1-5, optional
+  review          String?
+  reviewHidden    Boolean   @default(false)
+  studentSummary  String?
+
+  flags Flag[]
+
+  @@unique([postId, studentId])
+}
+
+model Flag {
+  id            String       @id @default(cuid())
+  orgId         String
+  org           Org          @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  studentId     String
+  student       Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  reason        String
+  status        String       @default("OPEN") // OPEN | RESOLVED
+  createdAt     DateTime     @default(now())
+}
